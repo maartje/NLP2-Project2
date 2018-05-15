@@ -16,6 +16,7 @@ def preprocess(path):
 
         # Byte-pair encodings (BPE)
         # TODO
+    return path_to_preprocessed
 
 
 def postprocess(path):

@@ -9,6 +9,9 @@ tpath_val = "../val/val.en"
 spath_test = "../test/test_2017_flickr.fr" 
 tpath_test = "../test/test_2017_flickr.en"
 
+spath_toy = "../toy_data/toy.fr" 
+tpath_toy = "../toy_data/toy.en"
+
 def path_to_preprocessed(path):
     return _path_to_outputfile(path, '.preprocessed')
 

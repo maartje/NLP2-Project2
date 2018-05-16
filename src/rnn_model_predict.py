@@ -21,7 +21,7 @@ def predict(encoder, decoder, input_tensor, max_length):
 
         decoder_hidden = encoder_hidden
 
-        decoded_words = []
+        decoded_indices = []
         decoder_attentions = torch.zeros(max_length, max_length)
 
         for di in range(max_length):
@@ -29,14 +29,12 @@ def predict(encoder, decoder, input_tensor, max_length):
                 decoder_input, decoder_hidden, encoder_outputs)
             decoder_attentions[di] = decoder_attention.data
             topv, topi = decoder_output.data.topk(1)
+            decoded_indices.append(topi.item())
             if topi.item() == EOS_token:
-                decoded_words.append('<EOS>')
                 break
-            else:
-                decoded_words.append(output_lang.index2word[topi.item()])
 
             decoder_input = topi.squeeze().detach()
 
-        return decoded_words, decoder_attentions[:di + 1]
+        return decoded_indices, decoder_attentions[:di + 1]
 
 

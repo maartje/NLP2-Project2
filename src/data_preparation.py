@@ -64,6 +64,7 @@ def tensorFromSentence(lang, sentence):
     indexes.append(EOS_token)
     return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
 
-def sentenceFromTensor(lang, tensor):
-    words = [lang.index2word[index] for [index] in tensor.tolist()]
+def sentenceFromIndexes(lang, indices):
+    words = [lang.index2word[index] for index in indices]
     return ' '.join(words[:-1])
+

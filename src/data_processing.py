@@ -37,7 +37,7 @@ def fix_missing_dot(line):
     if line[-2] == '.' or line[-1] == '.':
         return(line)            
     else:
-        return(line[:-2] + " ." + line[-1:])
+        return(line[:-1] + " ." + line[-1:])
 
 def fix_sentence_errors(fpath):
     with open(fpath, 'r') as lines:

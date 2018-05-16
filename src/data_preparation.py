@@ -6,9 +6,14 @@ SOS_token = 0
 EOS_token = 1
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def prepare_training_data(spath, tpath, useCache = True):
+    (slang, stensors) = _prepare_training_data_lang(spath, useCache)
+    (tlang, ttensors) = _prepare_training_data_lang(tpath, useCache)
+    tensor_pairs = list(zip(stensors, ttensors))
+    return (slang, tlang, tensor_pairs)
 
-def prepare_training_data(path):
-    path_preprocessed = preprocess(path)
+def _prepare_training_data_lang(path, useCache = True):
+    path_preprocessed = preprocess(path, useCache)
     lang = _read_language(path_preprocessed)
     tensors = list(_build_tensors(lang, path_preprocessed))
     return (lang, tensors)
@@ -48,14 +53,17 @@ def _build_tensors(lang, fpath):
     # TODO load/save?
     with open(fpath, 'r') as lines:
         for line in lines:
-            yield _tensorFromSentence(lang, line)
+            yield tensorFromSentence(lang, line)
 
 def _indexesFromSentence(lang, sentence):
     return [lang.word2index[word] for word in sentence.split(' ')]
 
 
-def _tensorFromSentence(lang, sentence):
+def tensorFromSentence(lang, sentence):
     indexes = _indexesFromSentence(lang, sentence)
     indexes.append(EOS_token)
     return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
 
+def sentenceFromTensor(lang, tensor):
+    words = [lang.index2word[index] for [index] in tensor.tolist()]
+    return ' '.join(words[:-1])

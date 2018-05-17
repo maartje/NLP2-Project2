@@ -66,9 +66,18 @@ def train(input_tensor, target_tensor, encoder, decoder,
     return loss.item() / target_length
 
 
-def trainIters(tensor_pairs, encoder, decoder, n_iters, max_length,
+def trainIters(index_array_pairs, encoder, decoder, n_iters, max_length,
         print_every=1000, plot_every=100, learning_rate=0.01):
     start = time.time()
+
+    tensor_pairs = [
+        (
+            torch.tensor(s_indices, dtype=torch.long, device=device).view(-1, 1),
+            torch.tensor(t_indices, dtype=torch.long, device=device).view(-1, 1),
+        )
+        for (s_indices, t_indices) in index_array_pairs
+    ]
+
     plot_losses = []
     print_loss_total = 0  # Reset every print_every
     plot_loss_total = 0  # Reset every plot_every

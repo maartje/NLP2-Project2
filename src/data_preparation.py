@@ -1,22 +1,20 @@
-import torch
 import filepaths as fp
 from data_processing import preprocess
 
 SOS_token = 0
 EOS_token = 1
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def prepare_training_data(spath, tpath, useCache = True):
-    (slang, stensors) = _prepare_training_data_lang(spath, useCache)
-    (tlang, ttensors) = _prepare_training_data_lang(tpath, useCache)
-    tensor_pairs = list(zip(stensors, ttensors))
-    return (slang, tlang, tensor_pairs)
+    (slang, s_index_arrays) = _prepare_training_data_lang(spath, useCache)
+    (tlang, t_index_arrays) = _prepare_training_data_lang(tpath, useCache)
+    index_array_pairs = list(zip(s_index_arrays, t_index_arrays))
+    return (slang, tlang, index_array_pairs)
 
 def _prepare_training_data_lang(path, useCache = True):
     path_preprocessed = preprocess(path, useCache)
     lang = _read_language(path_preprocessed)
-    tensors = list(_build_tensors(lang, path_preprocessed))
-    return (lang, tensors)
+    index_arrays = list(_build_index_arrays(lang, path_preprocessed))
+    return (lang, index_arrays)
 
 class Lang:
     def __init__(self, name):
@@ -49,20 +47,16 @@ def _read_language(fpath):
             lang.addSentence(line)
     return lang
 
-def _build_tensors(lang, fpath):
+def _build_index_arrays(lang, fpath):
     # TODO load/save?
     with open(fpath, 'r') as lines:
         for line in lines:
-            yield tensorFromSentence(lang, line)
+            yield indexesFromSentence(lang, line)
 
-def _indexesFromSentence(lang, sentence):
-    return [lang.word2index[word] for word in sentence.split(' ')]
-
-
-def tensorFromSentence(lang, sentence):
-    indexes = _indexesFromSentence(lang, sentence)
+def indexesFromSentence(lang, sentence):
+    indexes = [lang.word2index[word] for word in sentence.split(' ')]
     indexes.append(EOS_token)
-    return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
+    return indexes
 
 def sentenceFromIndexes(lang, indices):
     words = [lang.index2word[index] for index in indices]

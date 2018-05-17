@@ -10,7 +10,7 @@ def showLosses(plot_losses, plot_every):
     # this locator puts ticks at regular intervals
     loc = ticker.MultipleLocator(base=0.2)
     ax.yaxis.set_major_locator(loc)
-    iter_numbers = [i*100 for i in range(len(plot_losses))]
+    iter_numbers = [i*plot_every for i in range(len(plot_losses))]
     plt.plot(iter_numbers, plot_losses)
     plt.show()
 

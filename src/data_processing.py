@@ -20,7 +20,7 @@ def preprocess(path, useCache = True):
         # Byte-pair encodings (BPE)
         # TODO
     else:
-        print (f'warning: uses cached preprocessed file {path_to_preprocessed}')
+        print (f'info: uses cached preprocessed file {path_to_preprocessed}')
     return path_to_preprocessed
 
 

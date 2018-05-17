@@ -21,6 +21,9 @@ def path_to_postprocessed(path):
 def path_to_predicted(path):
     return _path_to_outputfile(path, '.predicted')
 
+def path_to_bleu(path):
+    return _path_to_outputfile(path, '.BLEU')[:-3]
+
 def _path_to_outputfile(path, addition):
     fpath = Path(path)
     fname = fpath.name[:-3] + addition + fpath.name[-3:]

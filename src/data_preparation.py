@@ -8,7 +8,12 @@ def prepare_training_data(spath, tpath, useCache = True):
     (slang, s_index_arrays) = _prepare_training_data_lang(spath, useCache)
     (tlang, t_index_arrays) = _prepare_training_data_lang(tpath, useCache)
     index_array_pairs = list(zip(s_index_arrays, t_index_arrays))
-    return (slang, tlang, index_array_pairs)
+    max_length = 0
+    for pair in index_array_pairs:
+        max_length = max(len(pair[0]), len(pair[1]), max_length)
+
+    # TODO use cache?
+    return (slang, tlang, index_array_pairs, max_length)
 
 def _prepare_training_data_lang(path, useCache = True):
     path_preprocessed = preprocess(path, useCache)
@@ -41,14 +46,12 @@ def _read_language(fpath):
     lname = fpath[-2:]
     lang = Lang(lname)
 
-    # TODO load/save?
     with open(fpath, 'r') as lines:
         for line in lines:
             lang.addSentence(line)
     return lang
 
 def _build_index_arrays(lang, fpath):
-    # TODO load/save?
     with open(fpath, 'r') as lines:
         for line in lines:
             yield indexesFromSentence(lang, line)

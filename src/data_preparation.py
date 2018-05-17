@@ -58,7 +58,10 @@ def indexesFromSentence(lang, sentence):
     indexes.append(EOS_token)
     return indexes
 
+def wordsFromIndexes(lang, indices):
+    return [lang.index2word[index] for index in indices]
+
 def sentenceFromIndexes(lang, indices):
-    words = [lang.index2word[index] for index in indices]
+    words = wordsFromIndexes(lang, indices)
     return ' '.join(words[:-1])
 

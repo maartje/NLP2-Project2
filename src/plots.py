@@ -14,7 +14,7 @@ def showPlot(points):
     plt.show()
 
 
-def showAttention(input_sentence, output_words, attentions):
+def showAttention(input_words, output_words, attentions):
     # Set up figure with colorbar
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -22,8 +22,7 @@ def showAttention(input_sentence, output_words, attentions):
     fig.colorbar(cax)
 
     # Set up axes
-    ax.set_xticklabels([''] + input_sentence.split(' ') +
-                       ['<EOS>'], rotation=90)
+    ax.set_xticklabels([''] + input_words, rotation=90)
     ax.set_yticklabels([''] + output_words)
 
     # Show label at every tick

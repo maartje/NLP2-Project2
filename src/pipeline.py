@@ -62,7 +62,7 @@ def evaluate(spath, tpath, slang, tlang,
 
     # calculate evaluation scores
     path_to_BLUE = fp.path_to_bleu(tpath)
-    evaluate.BLUE(path_to_predicted, path_to_target, path_to_BLUE)
+    BLUE(path_to_predicted, path_to_target, path_to_BLUE)
 
     print (f'Blue score written to {path_to_BLUE}')
 

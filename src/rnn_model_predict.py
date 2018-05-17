@@ -5,7 +5,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 SOS_token = 0
 EOS_token = 1
 
-def predict(encoder, decoder, input_tensor, max_length):
+def predict(encoder, decoder, s_indices, max_length):
+    input_tensor = torch.tensor(s_indices, dtype=torch.long, device=device).view(-1, 1)
     with torch.no_grad():
         input_length = input_tensor.size()[0]
         encoder_hidden = encoder.initHidden()

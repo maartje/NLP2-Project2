@@ -38,4 +38,6 @@ def predict(encoder, decoder, s_indices, max_length):
 
         return decoded_indices, decoder_attentions[:di + 1]
 
+def predict_all(encoder, decoder, s_indices_list, max_length):
+    return [predict(encoder, decoder, s_indices, max_length) for s_indices in s_indices_list]
 

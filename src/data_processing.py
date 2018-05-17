@@ -1,10 +1,10 @@
 import filepaths as fp
 import os
 
-def preprocess(path):
+def preprocess(path, useCache = True):
     path_to_preprocessed = fp.path_to_preprocessed(path)
     language = path[-2:]
-    if not os.path.isfile(path_to_preprocessed):
+    if not(useCache) or (not os.path.isfile(path_to_preprocessed)):
 
         # tokenize
         os.system(
@@ -19,6 +19,8 @@ def preprocess(path):
 
         # Byte-pair encodings (BPE)
         # TODO
+    else:
+        print (f'warning: uses cached preprocessed file {path_to_preprocessed}')
     return path_to_preprocessed
 
 
@@ -29,13 +31,13 @@ def lowercase(fname):
     f = open(fname, 'r')
     text = f.read()
     with open(fname, 'w') as out:
-        out.write(text.lower())
+        out.write(text.lower().strip())
 
 def fix_missing_dot(line):
-    if line[-2] == '.':
+    if line[-2] == '.' or line[-1] == '.':
         return(line)            
     else:
-        return(line[:-2] + " ." + line[-1:])
+        return(line[:-1] + " ." + line[-1:])
 
 def fix_sentence_errors(fpath):
     with open(fpath, 'r') as lines:

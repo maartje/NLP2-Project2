@@ -4,7 +4,6 @@ from torch import optim
 import random
 import time
 from debug import timeSince
-from plots import showPlot
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -108,6 +107,7 @@ def trainIters(index_array_pairs, encoder, decoder, n_iters, max_length,
             plot_losses.append(plot_loss_avg)
             plot_loss_total = 0
 
-    showPlot(plot_losses)
+    return plot_losses
+
 
 

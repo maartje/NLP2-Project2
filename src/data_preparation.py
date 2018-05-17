@@ -15,6 +15,13 @@ def prepare_training_data(spath, tpath, useCache = True):
     # TODO use cache?
     return (slang, tlang, index_array_pairs, max_length)
 
+def prepare_test_data(lang, path, useCache = True):
+    path_preprocessed = preprocess(path, useCache)
+    index_arrays = list(_build_index_arrays(lang, path_preprocessed))
+    return index_arrays
+    
+    
+
 def _prepare_training_data_lang(path, useCache = True):
     path_preprocessed = preprocess(path, useCache)
     lang = _read_language(path_preprocessed)
@@ -67,4 +74,8 @@ def wordsFromIndexes(lang, indices):
 def sentenceFromIndexes(lang, indices):
     words = wordsFromIndexes(lang, indices)
     return ' '.join(words[:-1])
+
+def sentenceFromIndexes_all(lang, indices_all):
+    return [sentenceFromIndexes(lang, indices) for indices in indices_all]
+
 

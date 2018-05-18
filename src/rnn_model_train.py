@@ -4,6 +4,8 @@ from torch import optim
 import random
 import time
 from debug import timeSince
+from datetime import datetime, timedelta
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -66,8 +68,11 @@ def train(input_tensor, target_tensor, encoder, decoder,
 
 
 def trainIters(index_array_pairs, encoder, decoder, n_iters, max_length,
-        print_every=1000, plot_every=100, learning_rate=0.01):
+        print_every=1000, plot_every=100, learning_rate=0.01, max_hours = 24):
     start = time.time()
+    start_time = datetime.now()
+    end_time = start_time + timedelta(hours = max_hours)
+
 
     tensor_pairs = [
         (
@@ -106,6 +111,10 @@ def trainIters(index_array_pairs, encoder, decoder, n_iters, max_length,
             plot_loss_avg = plot_loss_total / plot_every
             plot_losses.append(plot_loss_avg)
             plot_loss_total = 0
+
+        if datetime.now() > end_time:
+            print(f'exceeded max hours {max_hours}')
+            break
 
     return plot_losses
 

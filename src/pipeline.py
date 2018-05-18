@@ -39,7 +39,7 @@ def _evaluate(spath_test, tpath_test, slang, tlang,
               max_length, useCache = True):
 
     # build source indices from test file 
-    s_lists_of_indices = dp.prepare_test_data(slang, spath_test, useCache)
+    s_lists_of_indices = dp.prepare_test_data(slang, spath_test, max_length, useCache)
     
     # predict target indices
     (p_lists_of_indices, attentions) = fn_predict_all(

@@ -12,19 +12,16 @@ tpath_test = "../test/test_2017_flickr.en"
 spath_toy = "../toy_data/toy.fr" 
 tpath_toy = "../toy_data/toy.en"
 
-def path_to_preprocessed(path):
-    return _path_to_outputfile(path, '.preprocessed')
-
 def path_to_postprocessed(path):
-    return _path_to_outputfile(path, '.postprocessed')
+    return path_to_outputfile(path, '.postprocessed')
 
 def path_to_predicted(path):
-    return _path_to_outputfile(path, '.predicted')
+    return path_to_outputfile(path, '.predicted')
 
 def path_to_bleu(path):
-    return _path_to_outputfile(path, '.BLEU')[:-3]
+    return path_to_outputfile(path, '.BLEU')[:-3]
 
-def _path_to_outputfile(path, addition):
+def path_to_outputfile(path, addition):
     fpath = Path(path)
     fname = fpath.name[:-3] + addition + fpath.name[-3:]
     return str(Path('../output').joinpath(fname))

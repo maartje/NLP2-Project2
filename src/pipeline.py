@@ -7,13 +7,19 @@ from data_processing import preprocess
 from evaluate import BLUE 
 import random
 
-def run(spath_train, tpath_train, fn_train, 
-        spath_test, tpath_test, fn_predict_all,
-        max_length = 50, useCache = True):
+def run(spath_train, tpath_train, 
+        spath_test, tpath_test, 
+        fn_train, fn_predict_all,
+        max_length = 50, replace_unknown_words = True, useCache = False):
+
+    # data preprocessing
+    (spath_train_pp, tpath_train_pp, spath_test_pp, tpath_test_pp) = preprocess(
+        spath_train, tpath_train, spath_test, tpath_test, 
+        replace_unknown_words, useCache)
 
     # data structures for training
     (slang, tlang, index_array_pairs) = dp.prepare_training_data(
-        spath_train, tpath_train, max_length, useCache)
+        spath_train_pp, tpath_train_pp, max_length)
 
     # train and return losses for plotting
     (encoder, attn_decoder, plot_losses, plot_every) = fn_train(
@@ -26,20 +32,20 @@ def run(spath_train, tpath_train, fn_train,
     print (f'Models saved in TODO')
     print ()
 
-    _evaluate(spath_test, tpath_test, slang, tlang, 
+    _evaluate(spath_test_pp, tpath_test_pp, slang, tlang, 
               encoder, attn_decoder, fn_predict_all,
-              max_length, useCache = True)
+              max_length)
 
-    return encoder, attn_decoder, slang, tlang
+    return encoder, attn_decoder, slang, tlang, plot_losses
 
 
 
 def _evaluate(spath_test, tpath_test, slang, tlang, 
               encoder, attn_decoder, fn_predict_all,
-              max_length, useCache = True):
+              max_length):
 
     # build source indices from test file 
-    s_lists_of_indices = dp.prepare_test_data(slang, spath_test, max_length, useCache)
+    s_lists_of_indices = dp.prepare_test_data(slang, spath_test, max_length)
     
     # predict target indices
     (p_lists_of_indices, attentions) = fn_predict_all(
@@ -50,7 +56,7 @@ def _evaluate(spath_test, tpath_test, slang, tlang,
 
     #TODO: post process: de-tokenize, true-case
     # HACK: tokenize and lowercase target sentences instead
-    path_to_target = preprocess(tpath_test, useCache)
+    path_to_target = tpath_test
 
     # write predicted sentences to file
     path_to_predicted = fp.path_to_predicted(tpath_test)

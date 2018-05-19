@@ -1,27 +1,62 @@
 import filepaths as fp
 import os
+from collections import Counter
 
-def preprocess(path, useCache = True):
-    path_to_preprocessed = fp.path_to_preprocessed(path)
+def preprocess(
+        spath_train, tpath_train, spath_test, tpath_test,
+        replace_unknown_words = True, useCache = False):
+
+    spath_train_pp = fp.path_to_outputfile(spath_train, '.preprocessed-train')
+    tpath_train_pp = fp.path_to_outputfile(tpath_train, '.preprocessed-train')
+    spath_test_pp = fp.path_to_outputfile(spath_test, '.preprocessed-test')
+    tpath_test_pp = fp.path_to_outputfile(tpath_test, '.preprocessed-test')
+
+    # TODO: use cache?
+    # if not(useCache) or (not os.path.isfile(path_to_preprocessed)):
+    # else:
+    #     print (f'info: uses cached preprocessed file {path_to_preprocessed}')
+ 
+    svocab = preprocess_file(spath_train, spath_train_pp, replace_unknown_words)
+    preprocess_file(tpath_train, tpath_train_pp, replace_unknown_words)
+    preprocess_file(spath_test, spath_test_pp, replace_unknown_words, svocab)
+    preprocess_file(tpath_test, tpath_test_pp, False)
+
+    return spath_train_pp, tpath_train_pp, spath_test_pp, tpath_test_pp
+
+def preprocess_file(path, path_to_preprocessed, replace_unknown_words, vocab = None):
+
+    # tokenize
     language = path[-2:]
-    if not(useCache) or (not os.path.isfile(path_to_preprocessed)):
+    os.system(
+        f'./lib/tokenizer.perl -l {language} < {path} > {path_to_preprocessed}'
+    )
 
-        # tokenize
-        os.system(
-            f'./lib/tokenizer.perl -l {language} < {path} > {path_to_preprocessed}'
-        )
+    # lowercase
+    text = lowercase(path_to_preprocessed)
 
-        # lowercase
-        lowercase(path_to_preprocessed)
+    # split in sentences
+    sentences = text.split('\n')
 
-	# fix errors in sentences
-        fix_sentence_errors(path_to_preprocessed)
+    # fix errors in sentences
+    sentences = fix_sentence_errors(sentences)
 
-        # Byte-pair encodings (BPE)
-        # TODO
-    else:
-        print (f'info: uses cached preprocessed file {path_to_preprocessed}')
-    return path_to_preprocessed
+    # replace low frequency words in training data
+    # or unknown words in test data (for source language only)
+    if replace_unknown_words:
+        sentences_tokenized = [s.split(' ') for s in sentences]
+        if vocab: # test data
+            sentences_tokenized = _replace_unknown_words(sentences_tokenized, vocab)
+        else: # training data
+            (sentences_tokenized, vocab) = _replace_low_frequency_words(sentences_tokenized)
+        sentences = [' '.join(s) for s in sentences_tokenized]
+
+    # write to file
+    write_to_file(path_to_preprocessed, sentences)
+
+    # Byte-pair encodings (BPE)
+    # TODO
+
+    return vocab
 
 
 def postprocess(path):
@@ -30,19 +65,40 @@ def postprocess(path):
 def lowercase(fname):
     f = open(fname, 'r')
     text = f.read()
-    with open(fname, 'w') as out:
-        out.write(text.lower().strip())
+    return text.lower().strip()
 
 def fix_missing_dot(line):
     if line[-2] == '.' or line[-1] == '.':
         return(line)            
     else:
-        return(line[:-1] + " ." + line[-1:])
+        return(line + " ." )
 
-def fix_sentence_errors(fpath):
-    with open(fpath, 'r') as lines:
-        fixed = [fix_missing_dot(line) for line in lines]
-    with open(fpath, 'w') as out:
-        out.writelines(fixed)
+def fix_sentence_errors(sentences):
+    fixed = [fix_missing_dot(s) for s in sentences]
     return fixed
+
+def _replace_low_frequency_words(sentences_tokenized):
+    words = [w  for s in sentences_tokenized for w in s]
+    word_counts = Counter(words)
+    vocabulary = set(words)
+    vocabulary_counts = Counter(vocabulary)
+    frequent_word_counts = word_counts - vocabulary_counts
+    vocabulary_frequent_words = list(frequent_word_counts.keys())
+    if len(vocabulary_frequent_words) == len(vocabulary):
+        raise('We just assume that infrequent words exist ...')
+    vocabulary_frequent_words.append('<LOW>')
+    sentences_frequent_words = _replace_unknown_words(sentences_tokenized, vocabulary_frequent_words)
+    return (sentences_frequent_words, vocabulary_frequent_words)
+
+def _replace_unknown_words(sentences_tokenized, vocabulary):
+    replace_infrequent = lambda w: w if w in vocabulary else '<UNKNOWN>'
+    return [[replace_infrequent(w) for w in s] for s in sentences_tokenized ]
+
+def write_to_file(fpath, sentences):
+    result_sentences = [f'{s}\n' for s in sentences]
+    with open(fpath, 'w') as out:
+        out.writelines(result_sentences)
+
+def _path_to_preprocessed(path):
+    return fp.path_to_outputfile(path, '.preprocessed')
 

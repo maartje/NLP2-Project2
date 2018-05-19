@@ -1,26 +1,21 @@
 import filepaths as fp
-from data_processing import preprocess
 
 SOS_token = 0
 EOS_token = 1
 
-def prepare_training_data(spath, tpath, max_length, useCache = True):
-    (slang, s_index_arrays) = _prepare_training_data_lang(spath, max_length, useCache)
-    (tlang, t_index_arrays) = _prepare_training_data_lang(tpath, max_length, useCache)
+def prepare_training_data(spath_preprocessed, tpath_preprocessed, max_length):
+    (slang, s_index_arrays) = _prepare_training_data_lang(spath_preprocessed, max_length)
+    (tlang, t_index_arrays) = _prepare_training_data_lang(tpath_preprocessed, max_length)
     index_array_pairs = list(zip(s_index_arrays, t_index_arrays))
-
-    # TODO filter on max length
 
     # TODO cache in file?
     return (slang, tlang, index_array_pairs)
 
-def prepare_test_data(lang, path, max_length, useCache = True):
-    path_preprocessed = preprocess(path, useCache)
+def prepare_test_data(lang, path_preprocessed, max_length):
     index_arrays = list(_build_index_arrays(lang, path_preprocessed, max_length))
     return index_arrays
     
-def _prepare_training_data_lang(path, max_length, useCache = True):
-    path_preprocessed = preprocess(path, useCache)
+def _prepare_training_data_lang(path_preprocessed, max_length):
     lang = _read_language(path_preprocessed, max_length)
     index_arrays = list(_build_index_arrays(lang, path_preprocessed, max_length))
     return (lang, index_arrays)

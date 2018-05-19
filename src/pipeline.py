@@ -73,7 +73,7 @@ def _evaluate(spath_test, tpath_test, slang, tlang,
 
     # randomly plot some attention diagrams
     for i in range(3):
-        r = random.randint(0, len(p_lists_of_indices))
+        r = random.randint(0, len(p_lists_of_indices)-1)
         s_indices = s_lists_of_indices[r]
         p_indices = p_lists_of_indices[r]
         _attentions = attentions[r]

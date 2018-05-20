@@ -37,9 +37,6 @@ def preprocess_file(path, path_to_preprocessed, replace_unknown_words, vocab = N
     # split in sentences
     sentences = text.split('\n')
 
-    # fix errors in sentences
-    sentences = fix_sentence_errors(sentences)
-
     # replace low frequency words in training data
     # or unknown words in test data (for source language only)
     if replace_unknown_words:
@@ -66,16 +63,6 @@ def lowercase(fname):
     f = open(fname, 'r')
     text = f.read()
     return text.lower().strip()
-
-def fix_missing_dot(line):
-    if line[-2] == '.' or line[-1] == '.':
-        return(line)            
-    else:
-        return(line + " ." )
-
-def fix_sentence_errors(sentences):
-    fixed = [fix_missing_dot(s) for s in sentences]
-    return fixed
 
 def _replace_low_frequency_words(sentences_tokenized):
     words = [w  for s in sentences_tokenized for w in s]

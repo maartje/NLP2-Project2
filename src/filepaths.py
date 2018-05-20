@@ -12,7 +12,7 @@ tpath_test = "../test/test_2017_flickr.en"
 spath_toy = "../toy_data/toy.fr" 
 tpath_toy = "../toy_data/toy.en"
 
-spath_tutorial =  '../tutorial_data/tutorial.fr', 
+spath_tutorial =  '../tutorial_data/tutorial.fr' 
 tpath_tutorial = '../tutorial_data/tutorial.en'
 
 def path_to_postprocessed(path):

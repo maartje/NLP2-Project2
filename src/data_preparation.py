@@ -1,7 +1,9 @@
 import filepaths as fp
+import numpy as np
 
 SOS_token = 0
 EOS_token = 1
+PAD_token =  2
 
 def prepare_training_data(spath_preprocessed, tpath_preprocessed, max_length):
     (slang, s_index_arrays) = _prepare_training_data_lang(spath_preprocessed, max_length)
@@ -14,7 +16,7 @@ def prepare_training_data(spath_preprocessed, tpath_preprocessed, max_length):
 def prepare_test_data(lang, path_preprocessed, max_length):
     index_arrays = list(_build_index_arrays(lang, path_preprocessed, max_length))
     return index_arrays
-    
+
 def _prepare_training_data_lang(path_preprocessed, max_length):
     lang = _read_language(path_preprocessed, max_length)
     index_arrays = list(_build_index_arrays(lang, path_preprocessed, max_length))
@@ -25,12 +27,14 @@ class Lang:
         self.name = name
         self.word2index = {}
         self.word2count = {}
-        self.index2word = {0: "SOS", 1: "EOS"}
-        self.n_words = 2  # Count SOS and EOS
+        self.index2word = {0: "SOS", 1: "EOS", 2:"PAD"}
+        self.n_words = 3  # Count SOS and EOS
 
     def addSentence(self, sentence):
+        sent = ""
         for word in sentence.split(' '):
             self.addWord(word)
+            sent += word + " "
 
     def addWord(self, word):
         if word not in self.word2index:
@@ -60,6 +64,8 @@ def _build_index_arrays(lang, fpath, max_length):
 def indexesFromSentence(lang, sentence):
     indexes = [lang.word2index[word] for word in sentence.split(' ')]
     indexes.append(EOS_token)
+    max_length = 50
+    indexes += [PAD_token] * (max_length - len(indexes))
     return indexes
 
 def wordsFromIndexes(lang, indices):
@@ -71,5 +77,3 @@ def sentenceFromIndexes(lang, indices):
 
 def sentenceFromIndexes_all(lang, indices_all):
     return [sentenceFromIndexes(lang, indices) for indices in indices_all]
-
-

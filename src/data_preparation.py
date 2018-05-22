@@ -4,7 +4,7 @@ SOS_token = 0
 EOS_token = 1
 PAD_token =  2
 
-def prepare_data(spath_pp, tpath_pp, spath_test_pp, add_padding = True):
+def prepare_data(spath_pp, tpath_pp, spath_test_pp, padding = True):
     (slang, s_index_arrays) = _prepare_training_data_lang(spath_pp)
     (tlang, t_index_arrays) = _prepare_training_data_lang(tpath_pp)
     s_index_arrays_test = _prepare_test_data(slang, spath_test_pp)
@@ -13,7 +13,7 @@ def prepare_data(spath_pp, tpath_pp, spath_test_pp, add_padding = True):
     max_bpe_length = max([ len(l) for l in s_index_arrays_test + s_index_arrays]) 
     
     # add padding to source sentences
-    if add_padding:
+    if padding:
         for indices in s_index_arrays:
             add_padding(indices, max_bpe_length)
         for indices_test in s_index_arrays_test:

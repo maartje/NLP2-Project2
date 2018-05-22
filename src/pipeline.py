@@ -10,24 +10,24 @@ import random
 def run(spath_train, tpath_train, 
         spath_test, tpath_test, 
         fn_train, fn_predict_all,
-        max_sentence_length = 50, replace_unknown_words = True, 
+        max_sentence_length = 50, 
+        replace_unknown_words = True, 
         use_bpe = True, num_operations = 400, vocab_threshold = 5,
-        add_padding = True):
+        padding = True):
 
     # data preprocessing
     (spath_train_pp, tpath_train_pp, spath_test_pp, tpath_test_pp) = preprocess(
         spath_train, tpath_train, spath_test, tpath_test, 
         max_sentence_length,
         replace_unknown_words, 
-        use_bpe, num_operations, vocab_threshold,
-        useCache)
+        use_bpe, num_operations, vocab_threshold)
 
     print (f'Data files preprocessed ...')
     print ()
     
     # data structures for training
     (slang, tlang, index_array_pairs, s_index_arrays_test, max_bpe_length) = dp.prepare_data(
-        spath_train_pp, tpath_train_pp, spath_test_pp, add_padding)
+        spath_train_pp, tpath_train_pp, spath_test_pp, padding)
 
     print (f'{len(index_array_pairs)} inputs constructed for training ...')
     print ()

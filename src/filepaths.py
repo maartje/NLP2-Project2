@@ -15,6 +15,8 @@ tpath_toy = "../toy_data/toy.en"
 spath_tutorial =  '../tutorial_data/tutorial.fr' 
 tpath_tutorial = '../tutorial_data/tutorial.en'
 
+path_output_dir = '../output'
+
 def path_to_postprocessed(path):
     return path_to_outputfile(path, '.postprocessed')
 
@@ -27,6 +29,6 @@ def path_to_bleu(path):
 def path_to_outputfile(path, addition):
     fpath = Path(path)
     fname = fpath.name[:-3] + addition + fpath.name[-3:]
-    return str(Path('../output').joinpath(fname))
+    return str(Path(path_output_dir).joinpath(fname))
 
 

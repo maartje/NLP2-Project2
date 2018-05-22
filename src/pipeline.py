@@ -2,7 +2,7 @@ import filepaths as fp
 import data_preparation as dp
 
 from plots import showLosses, showAttention
-from data_processing import preprocess
+from data_processing import preprocess, postprocess
 
 from evaluate import BLUE 
 import random
@@ -10,20 +10,34 @@ import random
 def run(spath_train, tpath_train, 
         spath_test, tpath_test, 
         fn_train, fn_predict_all,
-        max_length = 50, replace_unknown_words = True, useCache = False):
+        max_sentence_length = 50, replace_unknown_words = True, 
+        use_bpe = True, num_operations = 400, vocab_threshold = 5,
+        add_padding = True):
 
     # data preprocessing
     (spath_train_pp, tpath_train_pp, spath_test_pp, tpath_test_pp) = preprocess(
         spath_train, tpath_train, spath_test, tpath_test, 
-        replace_unknown_words, useCache)
+        max_sentence_length,
+        replace_unknown_words, 
+        use_bpe, num_operations, vocab_threshold,
+        useCache)
 
+    print (f'Data files preprocessed ...')
+    print ()
+    
     # data structures for training
-    (slang, tlang, index_array_pairs) = dp.prepare_training_data(
-        spath_train_pp, tpath_train_pp, max_length)
+    (slang, tlang, index_array_pairs, s_index_arrays_test, max_bpe_length) = dp.prepare_data(
+        spath_train_pp, tpath_train_pp, spath_test_pp, add_padding)
+
+    print (f'{len(index_array_pairs)} inputs constructed for training ...')
+    print ()
 
     # train and return losses for plotting
     (encoder, attn_decoder, plot_losses, plot_every) = fn_train(
-        index_array_pairs, slang.n_words, tlang.n_words, max_length)
+        index_array_pairs, slang.n_words, tlang.n_words, max_bpe_length)
+
+    print (f'Training finished ...')
+    print ()
 
     # plot the losses
     showLosses(plot_losses, plot_every)
@@ -32,42 +46,50 @@ def run(spath_train, tpath_train,
     print (f'Models saved in TODO')
     print ()
 
-    _evaluate(spath_test_pp, tpath_test_pp, slang, tlang, 
+    _evaluate(s_index_arrays_test, tpath_test_pp, slang, tlang, 
               encoder, attn_decoder, fn_predict_all,
-              max_length)
+              max_bpe_length, use_bpe)
 
     return encoder, attn_decoder, slang, tlang, plot_losses
 
 
 
-def _evaluate(spath_test, tpath_test, slang, tlang, 
+def _evaluate(s_lists_of_indices, tpath_test, slang, tlang, 
               encoder, attn_decoder, fn_predict_all,
-              max_length):
+              max_bpe_length, use_bpe):
 
-    # build source indices from test file 
-    s_lists_of_indices = dp.prepare_test_data(slang, spath_test, max_length)
+    print (f'{len(s_lists_of_indices)} inputs constructed for testing ...')
+    print ()
     
     # predict target indices
     (p_lists_of_indices, attentions) = fn_predict_all(
-        encoder, attn_decoder, s_lists_of_indices, max_length)
+        encoder, attn_decoder, s_lists_of_indices, max_bpe_length)
+
+    print (f'{len(p_lists_of_indices)} outputs predicted ...')
+    print ()
     
     # transform to target sentences (todo: post processing)
     p_lists_of_sentences = dp.sentenceFromIndexes_all(tlang, p_lists_of_indices)
 
-    #TODO: post process: de-tokenize, true-case
-    # HACK: tokenize and lowercase target sentences instead
+    # tokenize and lowercase target sentences for comparison
     path_to_target = tpath_test
 
-    # write predicted sentences to file
-    path_to_predicted = fp.path_to_predicted(tpath_test)
+    # write predictions to file
+    path_to_predicted = fp.path_to_outputfile(tpath_test, '.predicted')
     with open(path_to_predicted, 'w') as out:
         out.writelines(p_lists_of_sentences)
 
-    print (f'Predictions written to {path_to_predicted}')
+    # undo BPE encoding for predictions
+    path_to_postprocessed = path_to_predicted
+    if use_bpe:
+        path_to_postprocessed = fp.path_to_outputfile(path_to_predicted, '.postprocessed')
+        postprocess(path_to_predicted, path_to_postprocessed, use_bpe)
+
+    print (f'Predictions written to {path_to_postprocessed}')
 
     # calculate evaluation scores
     path_to_BLUE = fp.path_to_bleu(tpath_test)
-    BLUE(path_to_predicted, path_to_target, path_to_BLUE)
+    BLUE(path_to_postprocessed, path_to_target, path_to_BLUE)
 
     print (f'Blue score written to {path_to_BLUE}')
 

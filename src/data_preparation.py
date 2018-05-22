@@ -31,10 +31,8 @@ class Lang:
         self.n_words = 3  # Count SOS and EOS
 
     def addSentence(self, sentence):
-        sent = ""
         for word in sentence.split(' '):
             self.addWord(word)
-            sent += word + " "
 
     def addWord(self, word):
         if word not in self.word2index:
@@ -59,12 +57,11 @@ def _build_index_arrays(lang, fpath, max_length):
     with open(fpath, 'r') as lines:
         for line in lines:
             if (len(line.split(' ')) < max_length):
-                yield indexesFromSentence(lang, line)
+                yield indexesFromSentence(lang, line, max_length)
 
-def indexesFromSentence(lang, sentence):
+def indexesFromSentence(lang, sentence, max_length):
     indexes = [lang.word2index[word] for word in sentence.split(' ')]
     indexes.append(EOS_token)
-    max_length = 50
     indexes += [PAD_token] * (max_length - len(indexes))
     return indexes
 

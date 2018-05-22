@@ -64,13 +64,13 @@ def _read_language(fpath):
 
     with open(fpath, 'r') as lines:
         for line in lines:
-            lang.addSentence(line)
+            lang.addSentence(line.strip())
     return lang
 
 def _build_index_arrays(lang, fpath):
     with open(fpath, 'r') as lines:
         for line in lines:
-            yield indexesFromSentence(lang, line)
+            yield indexesFromSentence(lang, line.strip())
 
 def indexesFromSentence(lang, sentence):
     indexes = [lang.word2index[word] for word in sentence.split(' ')]

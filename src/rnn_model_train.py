@@ -94,6 +94,7 @@ def trainIters(index_array_pairs, encoder, decoder, n_iters, max_length,
     decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
     training_pairs = [random.choice(tensor_pairs) for i in range(n_iters)]
     criterion = nn.NLLLoss()
+    loss_peak = False
 
     for iter in range(1, n_iters + 1):
         training_pair = training_pairs[iter - 1]
@@ -102,6 +103,18 @@ def trainIters(index_array_pairs, encoder, decoder, n_iters, max_length,
 
         loss = train(input_tensor, target_tensor, encoder,
                      decoder, encoder_optimizer, decoder_optimizer, criterion, max_length, clip)
+        
+        # MJ: debug peaks in loss diagram
+        if not loss_peak and plot_losses and (loss > 2.5 * plot_losses[-1]) : 
+            loss_peak = True
+            print ('peak in loss diagram: ')
+            print ('iter', iter)
+            print (' current loss', loss)
+            print ('avg prev loss', plot_losses[-1])
+            print (input_tensor)
+            print (target_tensor)
+            print ()
+
         print_loss_total += loss
         plot_loss_total += loss
 
@@ -115,6 +128,7 @@ def trainIters(index_array_pairs, encoder, decoder, n_iters, max_length,
             plot_loss_avg = plot_loss_total / plot_every
             plot_losses.append(plot_loss_avg)
             plot_loss_total = 0
+            loss_peak = False
 
         if datetime.now() > end_time:
             print(f'exceeded max hours {max_hours}')

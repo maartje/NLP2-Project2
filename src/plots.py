@@ -64,7 +64,7 @@ def merge_bpe_s(s_words, A):
             resulting_words.append(merge_word)
             resulting_columns.append(merge_column)
             merge_column = np.array([])
-    return resulting_words, np.column_stack(resulting_columns)
+    return [w.replace('@@', '') for w in resulting_words], np.column_stack(resulting_columns)
         
 def merge_bpe_t(t_words, X):
     merge_indices = [i for i, w in enumerate(t_words) if w.endswith('@@')]
@@ -83,7 +83,7 @@ def merge_bpe_t(t_words, X):
             resulting_words.append(merge_word)
             resulting_rows.append(merge_row)
             merge_row = np.array([])
-    return resulting_words, np.row_stack(resulting_rows)
+    return [w.replace('@@', '') for w in resulting_words], np.row_stack(resulting_rows)
         
 
 

@@ -16,6 +16,13 @@ def showLosses(plot_losses, plot_every):
 
 
 def showAttention(input_words, output_words, attentions, merge_subwords = False):
+    input_sentence = ' '.join(input_words)
+    output_sentence = ' '.join(output_words)
+    print (input_sentence)
+    print (input_sentence.replace('@@ ', ''))
+    print (output_sentence)
+    print (output_sentence.replace('@@ ', ''))
+
     if merge_subwords:
         (input_words, output_words, attentions) = merge_bpe(input_words, output_words, attentions)
 
@@ -35,12 +42,6 @@ def showAttention(input_words, output_words, attentions, merge_subwords = False)
 
     plt.show()
 
-    input_sentence = ' '.join(input_words)
-    output_sentence = ' '.join(output_words)
-    print (input_sentence)
-    print (input_sentence.replace('@@ ', ''))
-    print (output_sentence)
-    print (output_sentence.replace('@@ ', ''))
 
 def merge_bpe(s_words, t_words, A):
     s_words_merged, X = merge_bpe_s(s_words, A)
@@ -64,7 +65,7 @@ def merge_bpe_s(s_words, A):
             resulting_words.append(merge_word)
             resulting_columns.append(merge_column)
             merge_column = np.array([])
-    return resulting_words, np.column_stack(resulting_columns)
+    return [w.replace('@@', '') for w in resulting_words], np.column_stack(resulting_columns)
         
 def merge_bpe_t(t_words, X):
     merge_indices = [i for i, w in enumerate(t_words) if w.endswith('@@')]
@@ -83,7 +84,7 @@ def merge_bpe_t(t_words, X):
             resulting_words.append(merge_word)
             resulting_rows.append(merge_row)
             merge_row = np.array([])
-    return resulting_words, np.row_stack(resulting_rows)
+    return [w.replace('@@', '') for w in resulting_words], np.row_stack(resulting_rows)
         
 
 

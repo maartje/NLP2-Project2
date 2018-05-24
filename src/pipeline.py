@@ -3,28 +3,29 @@ import data_preparation as dp
 
 from plots import showLosses, showAttention
 from data_processing import preprocess, postprocess
+from evaluation_wrapper import write_to_file
 
-from evaluate import BLUE 
+from evaluate import BLUE
 import random
 
-def run(spath_train, tpath_train, 
-        spath_test, tpath_test, 
+def run(spath_train, tpath_train,
+        spath_test, tpath_test,
         fn_train, fn_predict_all,
-        max_sentence_length = 50, 
-        replace_unknown_words = True, 
+        max_sentence_length = 50,
+        replace_unknown_words = True,
         use_bpe = True, num_operations = 400, vocab_threshold = 5,
         padding = True):
 
     # data preprocessing
     (spath_train_pp, tpath_train_pp, spath_test_pp, tpath_test_pp) = preprocess(
-        spath_train, tpath_train, spath_test, tpath_test, 
+        spath_train, tpath_train, spath_test, tpath_test,
         max_sentence_length,
-        replace_unknown_words, 
+        replace_unknown_words,
         use_bpe, num_operations, vocab_threshold)
 
     print (f'Data files preprocessed ...')
     print ()
-    
+
     # data structures for training
     (slang, tlang, index_array_pairs, s_index_arrays_test, max_bpe_length) = dp.prepare_data(
         spath_train_pp, tpath_train_pp, spath_test_pp, padding)
@@ -46,7 +47,7 @@ def run(spath_train, tpath_train,
     print (f'Models saved in TODO')
     print ()
 
-    _evaluate(s_index_arrays_test, tpath_test_pp, slang, tlang, 
+    _evaluate(s_index_arrays_test, tpath_test_pp, slang, tlang,
               encoder, attn_decoder, fn_predict_all,
               max_bpe_length, use_bpe)
 
@@ -54,20 +55,20 @@ def run(spath_train, tpath_train,
 
 
 
-def _evaluate(s_lists_of_indices, tpath_test, slang, tlang, 
+def _evaluate(s_lists_of_indices, tpath_test, slang, tlang,
               encoder, attn_decoder, fn_predict_all,
               max_bpe_length, use_bpe):
 
     print (f'{len(s_lists_of_indices)} inputs constructed for testing ...')
     print ()
-    
+
     # predict target indices
     (p_lists_of_indices, attentions) = fn_predict_all(
         encoder, attn_decoder, s_lists_of_indices, max_bpe_length)
 
     print (f'{len(p_lists_of_indices)} outputs predicted ...')
     print ()
-    
+
     # transform to target sentences (todo: post processing)
     p_lists_of_sentences = dp.sentenceFromIndexes_all(tlang, p_lists_of_indices)
 
@@ -76,8 +77,10 @@ def _evaluate(s_lists_of_indices, tpath_test, slang, tlang,
 
     # write predictions to file
     path_to_predicted = fp.path_to_outputfile(tpath_test, '.predicted')
-    with open(path_to_predicted, 'w') as out:
-        out.writelines(p_lists_of_sentences)
+    write_to_file(path_to_predicted, p_lists_of_sentences)
+    # with open(path_to_predicted, 'w') as out:
+    #     out.writelines(p_lists_of_sentences)
+    #     out.write('\n')
 
     # undo BPE encoding for predictions
     path_to_postprocessed = path_to_predicted
@@ -106,10 +109,3 @@ def _evaluate(s_lists_of_indices, tpath_test, slang, tlang,
     # randomly show some translations
 
     print (f'Attention diagrams saved in TODO')
-
-
-
-    
-
-    
-

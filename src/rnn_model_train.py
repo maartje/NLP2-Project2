@@ -5,17 +5,17 @@ import random
 import time
 from debug import timeSince
 from datetime import datetime, timedelta
-
+from torch.nn.utils import clip_grad_norm_
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-teacher_forcing_ratio = 0.5
+teacher_forcing_ratio = 2 #0.5
 
 SOS_token = 0
 EOS_token = 1
 
 def train(input_tensor, target_tensor, encoder, decoder, 
-        encoder_optimizer, decoder_optimizer, criterion, max_length):
+        encoder_optimizer, decoder_optimizer, criterion, max_length, clip):
     encoder_hidden = encoder.initHidden()
 
     encoder_optimizer.zero_grad()
@@ -61,6 +61,10 @@ def train(input_tensor, target_tensor, encoder, decoder,
 
     loss.backward()
 
+    if clip:
+        clip_grad_norm_(decoder.parameters(), clip) # MJ: to prevent peaks
+        clip_grad_norm_(encoder.parameters(), clip) # MJ: to prevent peaks
+
     encoder_optimizer.step()
     decoder_optimizer.step()
 
@@ -68,7 +72,7 @@ def train(input_tensor, target_tensor, encoder, decoder,
 
 
 def trainIters(index_array_pairs, encoder, decoder, n_iters, max_length,
-        print_every=1000, plot_every=100, learning_rate=0.01, max_hours = 24):
+        print_every=1000, plot_every=100, learning_rate=0.01, max_hours = 24, clip = None):
     start = time.time()
     start_time = datetime.now()
     end_time = start_time + timedelta(hours = max_hours)
@@ -97,7 +101,7 @@ def trainIters(index_array_pairs, encoder, decoder, n_iters, max_length,
         target_tensor = training_pair[1]
 
         loss = train(input_tensor, target_tensor, encoder,
-                     decoder, encoder_optimizer, decoder_optimizer, criterion, max_length)
+                     decoder, encoder_optimizer, decoder_optimizer, criterion, max_length, clip)
         print_loss_total += loss
         plot_loss_total += loss
 

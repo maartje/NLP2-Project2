@@ -12,7 +12,7 @@ import torch
 def run(spath_train, tpath_train,
         spath_test, tpath_test,
         fn_train, fn_predict_all,
-        max_sentence_length = 50,
+        max_sentence_length = 17,
         replace_unknown_words = True,
         use_bpe = True, num_operations = 400, vocab_threshold = 5,
         padding = True):

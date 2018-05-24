@@ -7,6 +7,7 @@ from evaluation_wrapper import write_to_file
 
 from evaluate import BLUE
 import random
+import torch
 
 def run(spath_train, tpath_train,
         spath_test, tpath_test,

@@ -39,7 +39,12 @@ def run(spath_train, tpath_train,
 
     print (f'Training finished ...')
     print ()
-
+    torch.save(encoder, 'encoder.pt')
+    torch.save(attn_decoder, 'attn_decoder.pt')
+    data = (s_index_arrays_test, slang, tlang, max_bpe_length)
+    fname = 'data_run'
+    with open(fname, "w") as file:
+        file.write(str(data))
     # plot the losses
     showLosses(plot_losses, plot_every)
 
@@ -64,7 +69,7 @@ def _evaluate(s_lists_of_indices, tpath_test, slang, tlang,
 
     # predict target indices
     (p_lists_of_indices, attentions) = fn_predict_all(
-        encoder, attn_decoder, s_lists_of_indices, max_bpe_length) 
+        encoder, attn_decoder, s_lists_of_indices, max_bpe_length)
 
     print (f'{len(p_lists_of_indices)} outputs predicted ...')
     print ()

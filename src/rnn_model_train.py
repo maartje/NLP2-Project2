@@ -6,6 +6,7 @@ import time
 from debug import timeSince
 from datetime import datetime, timedelta
 from torch.nn.utils import clip_grad_norm_
+from itertools import chain
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -15,11 +16,10 @@ SOS_token = 0
 EOS_token = 1
 
 def train(input_tensor, target_tensor, encoder, decoder, 
-        encoder_optimizer, decoder_optimizer, criterion, max_length, clip):
+        optimizer, criterion, max_length, clip):
     encoder_hidden = encoder.initHidden()
 
-    encoder_optimizer.zero_grad()
-    decoder_optimizer.zero_grad()
+    optimizer.zero_grad()
 
     input_length = input_tensor.size(0)
     target_length = target_tensor.size(0)
@@ -65,8 +65,7 @@ def train(input_tensor, target_tensor, encoder, decoder,
         clip_grad_norm_(decoder.parameters(), clip) # MJ: to prevent peaks
         clip_grad_norm_(encoder.parameters(), clip) # MJ: to prevent peaks
 
-    encoder_optimizer.step()
-    decoder_optimizer.step()
+    optimizer.step()
 
     return loss.item() / target_length
 
@@ -90,8 +89,7 @@ def trainIters(index_array_pairs, encoder, decoder, n_iters, max_length,
     print_loss_total = 0  # Reset every print_every
     plot_loss_total = 0  # Reset every plot_every
 
-    encoder_optimizer = optim.SGD(encoder.parameters(), lr=learning_rate)
-    decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
+    optimizer = optim.SGD(chain(encoder.parameters(), decoder.parameters()), lr=learning_rate)
     training_pairs = [random.choice(tensor_pairs) for i in range(n_iters)]
     criterion = nn.NLLLoss()
     loss_peak = False
@@ -102,7 +100,7 @@ def trainIters(index_array_pairs, encoder, decoder, n_iters, max_length,
         target_tensor = training_pair[1]
 
         loss = train(input_tensor, target_tensor, encoder,
-                     decoder, encoder_optimizer, decoder_optimizer, criterion, max_length, clip)
+                     decoder, optimizer, criterion, max_length, clip)
         
         # MJ: debug peaks in loss diagram
         if not loss_peak and plot_losses and (loss > 2.5 * plot_losses[-1]) : 

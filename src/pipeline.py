@@ -104,7 +104,7 @@ def _evaluate(s_lists_of_indices, tpath_test, slang, tlang,
         _attentions = attentions[r]
         s_words = dp.wordsFromIndexes(slang, s_indices)
         p_words = dp.wordsFromIndexes(tlang, p_indices)
-        showAttention(s_words, p_words, _attentions)
+        showAttention(s_words, p_words, _attentions.numpy(), use_bpe)
 
     # randomly show some translations
 

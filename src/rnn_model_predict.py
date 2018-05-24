@@ -25,9 +25,7 @@ def predict(encoder, decoder, s_indices, max_length):
         decoded_indices = []
         decoder_attentions = torch.zeros(max_length, max_length)
 
-        # we allow the target sentence to be twice the max_bpe_length
-        # we are mostly interested in the model ending the sentence
-        for di in range(2 * max_length):
+        for di in range(max_length):
             decoder_output, decoder_hidden, decoder_attention = decoder(
                 decoder_input, decoder_hidden, encoder_outputs)
             decoder_attentions[di] = decoder_attention.data

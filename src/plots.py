@@ -32,5 +32,12 @@ def showAttention(input_words, output_words, attentions):
 
     plt.show()
 
+    input_sentence = ' '.join(input_words)
+    output_sentence = ' '.join(output_words)
+    print (input_sentence)
+    print (input_sentence.replace('@@ ', ''))
+    print (output_sentence)
+    print (output_sentence.replace('@@ ', ''))
+
 
 

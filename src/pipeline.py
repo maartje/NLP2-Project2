@@ -51,7 +51,7 @@ def run(spath_train, tpath_train,
               encoder, attn_decoder, fn_predict_all,
               max_bpe_length, use_bpe)
 
-    return encoder, attn_decoder, slang, tlang, plot_losses
+    return encoder, attn_decoder, slang, tlang, plot_losses, max_bpe_length
 
 
 
@@ -103,8 +103,8 @@ def _evaluate(s_lists_of_indices, tpath_test, slang, tlang,
         p_indices = p_lists_of_indices[r]
         _attentions = attentions[r]
         s_words = dp.wordsFromIndexes(slang, s_indices)
-        t_words = dp.wordsFromIndexes(tlang, p_indices)
-        showAttention(s_words, t_words, _attentions)
+        p_words = dp.wordsFromIndexes(tlang, p_indices)
+        showAttention(s_words, p_words, _attentions)
 
     # randomly show some translations
 

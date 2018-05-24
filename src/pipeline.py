@@ -40,17 +40,19 @@ def run(spath_train, tpath_train,
 
     print (f'Training finished ...')
     print ()
+
+    # plot the losses
+    showLosses(plot_losses, plot_every)
+    print (f'Losses diagram saved in TODO')
+
+    # save models and data
     torch.save(encoder, 'encoder.pt')
     torch.save(attn_decoder, 'attn_decoder.pt')
     data = (s_index_arrays_test, slang, tlang, max_bpe_length)
     fname = 'data_run'
     with open(fname, "w") as file:
         file.write(str(data))
-    # plot the losses
-    showLosses(plot_losses, plot_every)
-
-    print (f'Losses diagram saved in TODO')
-    print (f'Models saved in TODO')
+    print (f'Models and data saved in: encoder.pt, attn_decoder.pt, data_run')
     print ()
 
     _evaluate(s_index_arrays_test, tpath_test_pp, slang, tlang,

@@ -64,7 +64,9 @@ def _evaluate(s_lists_of_indices, tpath_test, slang, tlang,
 
     # predict target indices
     (p_lists_of_indices, attentions) = fn_predict_all(
-        encoder, attn_decoder, s_lists_of_indices, max_bpe_length)
+        encoder, attn_decoder, s_lists_of_indices, 2 * max_bpe_length) 
+        # we allow the target sentence to be twice the max_bpe_length
+        # we are mostly interested in the model ending the sentence
 
     print (f'{len(p_lists_of_indices)} outputs predicted ...')
     print ()

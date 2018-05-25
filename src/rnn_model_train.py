@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 from torch.nn.utils import clip_grad_norm_
 from itertools import chain
 
+#from calculate_loss import calculate_average_loss
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 teacher_forcing_ratio = 2 #0.5
@@ -95,6 +97,8 @@ def trainIters(index_array_pairs, encoder, decoder, n_epochs, max_length,
     
     n_iters = n_epochs * len(tensor_pairs)
     for epoch in range(n_epochs):
+ #       print (f'epoch {epoch}, training loss:', 
+ #              calculate_average_loss(encoder, decoder, tensor_pairs, max_length))
 
         for i in range(0, len(tensor_pairs)):
             iter = i + 1 + epoch * len(tensor_pairs)

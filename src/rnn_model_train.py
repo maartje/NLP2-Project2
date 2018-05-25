@@ -97,6 +97,7 @@ def trainIters(index_array_pairs, encoder, decoder, n_epochs, max_length,
     
     n_iters = n_epochs * len(tensor_pairs)
     for epoch in range(n_epochs):
+        print(f'start epoch: {epoch} {datetime.now()}')
  #       print (f'epoch {epoch}, training loss:', 
  #              calculate_average_loss(encoder, decoder, tensor_pairs, max_length))
 

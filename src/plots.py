@@ -4,7 +4,7 @@ import matplotlib.ticker as ticker
 import numpy as np
 
 
-def showLosses(plot_losses, plot_every):
+def showLosses(plot_losses, plot_every, fname=None):
     plt.figure()
     fig, ax = plt.subplots()
     # this locator puts ticks at regular intervals
@@ -12,10 +12,12 @@ def showLosses(plot_losses, plot_every):
     ax.yaxis.set_major_locator(loc)
     iter_numbers = [i*plot_every for i in range(len(plot_losses))]
     plt.plot(iter_numbers, plot_losses)
+    if fname:
+        _ = plt.savefig(fname)
     plt.show()
 
 
-def showAttention(input_words, output_words, attentions, merge_subwords = False):
+def showAttention(input_words, output_words, attentions, merge_subwords = False, fname=None):
     input_sentence = ' '.join(input_words)
     output_sentence = ' '.join(output_words)
     print (input_sentence)
@@ -40,6 +42,8 @@ def showAttention(input_words, output_words, attentions, merge_subwords = False)
     ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
 
+    if fname:
+        _ = plt.savefig(fname)
     plt.show()
 
 

@@ -23,8 +23,8 @@ def path_to_postprocessed(path):
 def path_to_predicted(path):
     return path_to_outputfile(path, '.predicted')
 
-def path_to_bleu(path):
-    return path_to_outputfile(path, '.BLEU')[:-3]
+def path_to_bleu(path, model_name = 'nn'):
+    return path_to_outputfile(path, f'.{model_name}.BLEU')[:-3]
 
 def path_to_outputfile(path, addition):
     fpath = Path(path)

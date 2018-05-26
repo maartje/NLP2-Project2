@@ -44,7 +44,7 @@ def run(spath_train, tpath_train,
     print ()
 
     # plot the losses
-    showLosses(plot_losses, plot_every)
+    showLosses(plot_losses, plot_every, f'../output/{model_name}_losses.png')
     print (f'Losses diagram saved in TODO')
 
     persistence.save(plot_losses, fp.path_to_outputfile(f'{model_name}.tl', '.trainloss'))
